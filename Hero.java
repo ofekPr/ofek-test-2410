@@ -6,17 +6,17 @@ public class Hero {
     public String getName() { return name; }
     public boolean getIsGood() { return isGood; }
 
-     public Hero(String name, int stamina, boolean isGood) {
+    public Hero(String name, int stamina, boolean isGood) {
         this.stamina = stamina;
         this.name = name;
         this.isGood = isGood;
-     }
+    }
 
-     public boolean canWin(Hero h) {
+    public boolean canWin(Hero h) {
         return this.isGood != h.getIsGood() && this.stamina > h.getStamina();
-     }
+    }
 
-     public String toString() {
+    public String toString() {
         return this.name + " is a hero. It is " + this.stamina + " power points. Is it good? " + this.isGood;
-     }
+    }
 }

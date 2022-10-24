@@ -1,6 +1,25 @@
 public class Main {
-    public int biggestMat(int[][] m, int n) {
-        return 5
+    public static int biggestMat(int[][] m, int n) {
+        int maxSum = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                maxSum += m[i][j];
+            }
+        }
+        for (int i = 0; i < m.length - n; i++) {
+            for (int j = 0; j < m[0].length - n; j++) {
+                int sum = 0;
+                for (int x = i; x < i + n; x++) {
+                    for (int y = j; y < j + n; y++) {
+                        sum += m[x][y];
+                    }
+                }
+                if (sum > maxSum) {
+                    maxSum = sum;
+                }
+            }
+        }
+        return maxSum;
     }
 
     public static void main(String[] args) {
@@ -28,5 +47,7 @@ public class Main {
                 {5, 2, 9, 3, 4},
                 {4, 1, 5, 2, 5}
         };
+
+        System.out.println(biggestMat(mat, 3));
     }
 }
