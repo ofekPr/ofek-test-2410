@@ -1,53 +1,149 @@
+import java.util.Scanner;
+
 public class Main {
-    public static int biggestMat(int[][] m, int n) {
-        int maxSum = 0;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                maxSum += m[i][j];
+    public static Scanner input = new Scanner(System.in);
+
+    public static Node<Integer> arrToList(int[] arr) {  // ex1-1
+        Node<Integer> p = new Node<Integer>(arr[0]);
+        Node<Integer> t = p;
+        for (int i = 1; i < arr.length; i++) {
+            p.setNext(new Node<Integer>(arr[i]));
+            p  = p.getNext();
+        }
+        return t;
+    }
+
+    public static Node<Integer> inputlist() {  //ex1-3
+        Node<Integer> p = new Node<Integer>(input.nextInt());
+        Node<Integer> t = p;
+        while (true) {
+            int num = input.nextInt();
+            if (num == -1) {
+                break;
+            }
+            p.setNext(new Node<Integer>(num));
+            p  = p.getNext();
+        }
+        return t;
+    }
+
+    public static void printEven(Node<Integer> p) {  // ex1-4
+        while(p != null) {
+            if (p.getValue() % 2 == 0) {
+                System.out.println(p.getValue());
+            }
+            p = p.getNext();
+        }
+    }
+
+    public static boolean findNum(Node<Integer> p, int num, boolean hasFound) {  // ex1-5
+        if (p.getValue() == num) return true;
+        if (p.getNext() == null) return false;
+        return findNum(p.getNext(), num, false);
+    }
+
+    public static Node<Integer> removeNum(Node<Integer> p, int num) {  //ex1-6
+        if (!findNum(p, num, false)) return null;
+        if (p.getValue() == num) return p.getNext();
+        Node<Integer> t = p;
+        while(p.getNext() != null && p.getNext().getNext() != null) {
+            if (p.getNext().getValue() == num) {
+                p.setNext(p.getNext().getNext());
+            }
+            p = p.getNext();
+        }
+        if (p.getNext() != null && p.getNext().getValue() == num) {
+            p.setNext(null);
+        }
+        return t;
+    }
+
+    public static boolean isAllInList(Node<Integer> L1, Node<Integer> L2) {  // ex1-7
+        if(L1 == null) return true;
+        Node<Integer> t2 = L2;
+        boolean isFound = false;
+        while(L2 != null && !isFound) {
+            if (L1.getValue() == L2.getValue()) {
+                isFound = true;
+            }
+            L2 = L2.getNext();
+        }
+        if (!isFound) return false;
+        return isAllInList(L1.getNext(), t2);
+    }
+
+    public static boolean printInBoth(Node<Integer> L1, Node<Integer> L2) {  // ex1-8
+        if(L1 == null) return true;
+        Node<Integer> t2 = L2;
+        boolean isFound = false;
+        while(L2 != null && !isFound) {
+            if (L1.getValue() == L2.getValue()) {
+                System.out.println(L1.getValue());
+                isFound = true;
+            }
+            L2 = L2.getNext();
+        }
+        return printInBoth(L1.getNext(), t2);
+    }
+
+    public static Node<Integer> listWithBoth(Node<Integer> L1, Node<Integer> L2) {  //ex1-9
+        if(L1 == null) return null;
+        Node<Integer> t1 = new Node<Integer>(0);
+        Node<Integer> t2 = L2;
+        boolean isFound = false;
+        while(L2 != null && !isFound) {
+            if (L1.getValue() == L2.getValue()) {
+                isFound = true;
+                t1.setValue(L1.getValue());
+                t1.setNext(listWithBoth(L1.getNext(), t2));
+            }
+            L2 = L2.getNext();
+        }
+        if (!isFound) {
+            return listWithBoth(L1.getNext(), t2);
+        }
+        return t1;
+    }
+
+    public static Node<Integer> mergeList(Node<Integer> p1, Node<Integer> p2) {  //ex2-1
+        Node<Integer> finalP;
+        if (p2.getValue() < p1.getValue()) {
+            finalP = new Node<Integer>(p2.getValue());
+            p2 = p2.getNext();
+        } else {
+            finalP = new Node<Integer>(p1.getValue());
+            p1 = p1.getNext();
+        }
+        Node<Integer> retrurnP = finalP;
+        while(p1 != null || p2 != null) {
+            if (p1 == null || p2.getValue() < p1.getValue()) {
+                finalP.setNext(new Node<Integer>(p2.getValue()));
+                finalP = finalP.getNext();
+                p2 = p2.getNext();
+            } else {
+                finalP.setNext(new Node<Integer>(p1.getValue()));
+                finalP = finalP.getNext();
+                p1 = p1.getNext();
             }
         }
-        for (int i = 0; i < m.length - n; i++) {
-            for (int j = 0; j < m[0].length - n; j++) {
-                int sum = 0;
-                for (int x = i; x < i + n; x++) {
-                    for (int y = j; y < j + n; y++) {
-                        sum += m[x][y];
-                    }
-                }
-                if (sum > maxSum) {
-                    maxSum = sum;
-                }
-            }
-        }
-        return maxSum;
+        return retrurnP;
     }
 
     public static void main(String[] args) {
-        Hero h1 = new Hero("Ofek", 10, true);
-        Hero h2 = new Hero("Ido", 5, false);
-        Hero h3 = new Hero("Tahel", 7, true);
-        System.out.println(h1);
-        System.out.println(h2);
-        System.out.println(h3);
-        Bunch b1 = new Bunch("Bunch1", 5);
-        System.out.println(b1.canAddHero(h1));
-        b1.addHero(h1);
-        System.out.println(b1.canAddHero(h2));
-        b1.addHero(h2);
-        System.out.println(b1.canAddHero(h3));
-        b1.addHero(h3);
-        System.out.println(b1);
-        System.out.println(b1.stronger());
-
-        int[][] mat = {
-                {2, 4, 1, 3, 5},
-                {1, 6, 9, 7, 3},
-                {7, 5, 8, 8, 2},
-                {3, 8, 4, 5, 1},
-                {5, 2, 9, 3, 4},
-                {4, 1, 5, 2, 5}
-        };
-
-        System.out.println(biggestMat(mat, 3));
+        int[] arr =  {1, 2, 3, 4, 5, 6, 7};
+        int[] arr2 =  {0, 8, 9};
+        Node<Integer> p1 = arrToList(arr);
+        System.out.println(p1);
+        Node<Integer>  p2 = arrToList(arr2);
+        System.out.println(p2);
+//        printEven(p2);
+//        System.out.println(findNum(p2, 2, false));
+//        System.out.println(findNum(p2, 5, false));
+//        System.out.println(findNum(p2, 1000, false));
+//        System.out.println(removeNum(p2, 7));
+//        System.out.println(isAllInList(p1, p2));
+//        printInBoth(p1, p2);
+//        System.out.println(listWithBoth(p1, p2));
+        System.out.println(mergeList(p1, p2));
     }
 }
