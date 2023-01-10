@@ -162,14 +162,19 @@ public class Main {
     }
 
     public static int sumDistance(Node<Integer> p1, int value) {  // ex2-3
-        if (!findNum(p1, value, 8)) {
+        if (!findNum(p1, value, false)) {
             return -1;
         }
         int length = p1.len();
-        int sum = 0, index = 0;
-        while(p1 != null) {
+        int sum = -1, index = 0;
+        while(p1 != null && findNum(p1, value, false)) {
             if (p1.getValue() == value) {
-                sum += Math.min(Math.abs(index), Math.abs(length - index - 1));
+                if (sum == -1) {
+                    sum = index;
+                }
+                if (p1.hasNext() && !findNum(p1.getNext(), value, false)) {
+                    sum += length - index - 1;
+                }
             }
             index++;
             p1 = p1.getNext();
@@ -177,17 +182,137 @@ public class Main {
         return sum;
     }
 
+    public static boolean areAllDif(Node<Integer> p1) {  // ex2-4
+        while(p1.hasNext()) {
+            if (findNum(p1.getNext(), p1.getValue(), false)) {
+                return false;
+            }
+            p1 = p1.getNext();
+        }
+        return true;
+    }
+
+    public static Node<Integer> listAllUnique(Node<Integer> p1) {  // ex2-5
+        Node<Integer> uniqueList = null;
+        Node<Integer> returnList = null;
+        while(p1 != null) {
+            if (!p1.hasNext() || !findNum(p1.getNext(), p1.getValue(), false)) {
+                if (uniqueList == null) {
+                    uniqueList = new Node<Integer>(p1.getValue());
+                    returnList = uniqueList;
+                } else {
+                    uniqueList.setNext(new Node<Integer>(p1.getValue()));
+                    uniqueList = uniqueList.getNext();
+                }
+            }
+            p1 = p1.getNext();
+        }
+        return returnList;
+    }
+
+    public static int maxSeriesLength(Node<Integer> p1) {  // ex2-6
+        int maxSeriesLen = 0;
+        int currentSeries = 1;
+        while(p1 != null) {
+            if (p1.hasNext() && p1.getValue() <= p1.getNext().getValue()) {
+                currentSeries++;
+            } else {
+                if (currentSeries > maxSeriesLen) {
+                    maxSeriesLen = currentSeries;
+                }
+                currentSeries = 1;
+            }
+            p1 = p1.getNext();
+        }
+        return maxSeriesLen;
+    }
+
+    public static void printMaxSeriesInList(Node<Integer> p1) {  // ex2-7
+        int maxSeriesLen = 0;
+        Node<Integer> longestSeries = new Node<Integer>(p1.getValue());
+        int currentSeriesLen = 1;
+        Node<Integer> currentSeries = new Node<Integer>(p1.getValue());
+        Node<Integer> currentSeriesFirst = currentSeries;
+        while(p1 != null) {
+            if (p1.hasNext() && p1.getValue() <= p1.getNext().getValue()) {
+                currentSeriesLen++;
+                currentSeries.setNext(new Node<Integer>(p1.getNext().getValue()));
+                currentSeries = currentSeries.getNext();
+            } else {
+                if (currentSeriesLen > maxSeriesLen) {
+                    maxSeriesLen = currentSeriesLen;
+                    longestSeries = currentSeriesFirst;
+                }
+                if (p1.hasNext()) {
+                    currentSeries = new Node<Integer>(p1.getNext().getValue());
+                    currentSeriesFirst = currentSeries;
+                    currentSeriesLen = 1;
+                }
+            }
+            p1 = p1.getNext();
+        }
+        System.out.println(longestSeries);
+    }
+
+    public static boolean isFromReputations(Node<Integer> p1, Node<Integer> p2) {  // ex2-8
+        Node<Integer> firstOfP1 = p1;
+        boolean isFullRepeatation = false;
+        while (p2 != null) {
+            isFullRepeatation = false;
+            if (p1.getValue() != p2.getValue()) {
+                return false;
+            }
+            if (!p1.hasNext()) {
+                isFullRepeatation = true;
+                p1 = firstOfP1;
+            } else {
+                p1 = p1.getNext();
+            }
+            p2 = p2.getNext();
+        }
+        return isFullRepeatation;
+    }
+
+    public static boolean isContaining(Node<Integer> p1, Node<Integer> p2) { //ex2-9
+        Node<Integer> firstOfP1 = p1;
+        while (p2 != null) {
+            if (p1.getValue() != p2.getValue()) {
+                p1 = firstOfP1;
+            } else if (!p1.hasNext()) {
+                return true;
+            } else {
+                p1 = p1.getNext();
+            }
+            p2 = p2.getNext();
+        }
+        return false;
+    }
+
+    public static boolean isContainingAllOneDigits(Node<Integer> p1) {  //ex2-10
+        int[] digits = new int[10];
+        while(p1 != null) {
+            if (p1.getValue() >= 0 && p1.getValue() < 10) {
+                digits[p1.getValue()]++;
+            }
+            p1 = p1.getNext();
+        }
+        for (int i = 0; i < digits.length; i++) {
+            if (digits[i] == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     public static void printNewExe(String str){
         System.out.println("\n**********************************************\n" + str);
     }
 
     public static void main(String[] args) {
         printNewExe("Initializing lists:");
-        int[] arr =  {1, 2, 3, 4, 5, 6, 7};
-        int[] arr2 =  {0, 1, 2, 8, 9};
-        Node<Integer> p1 = arrToList(arr);
+        Node<Integer> p1 = arrToList(new int[]{1, 2, 3, 4, 5, 6, 7});
         System.out.println(p1);
-        Node<Integer>  p2 = arrToList(arr2);
+        Node<Integer>  p2 = arrToList(new int[]{0, 1, 2, 8, 9});
         System.out.println(p2);
 
         printNewExe("Printing even numbers only in p2:");
@@ -216,8 +341,7 @@ public class Main {
 
         printNewExe("Merged list:");
         System.out.println(mergeList(p1, p2));
-        int[] arr3 = {9, 2, 8, 3, 8, 5};
-        Node<Integer> p3 = arrToList(arr3);
+        Node<Integer> p3 = arrToList(new int[]{9, 2, 8, 3, 8, 5});
 
         printNewExe("New p3:");
         System.out.println(p3);
@@ -227,5 +351,47 @@ public class Main {
 
         printNewExe("Sort p3:");
         System.out.println(selectionSort(p3));
+
+        printNewExe("Are all p2 and p3 values different:");
+        System.out.println(areAllDif(p2));
+        System.out.println(areAllDif(p3));
+
+        Node<Integer> p4 = arrToList(new int[]{1, 2, 3, 3, 2, 1, 5, 6, 7, 8, 10});
+
+        printNewExe("List of p4 values with only different values:");
+        System.out.println(p4);
+        System.out.println(listAllUnique(p4));
+
+        printNewExe("longest growing series length in p4:");
+        p4 = arrToList(new int[]{1, 2, 3, 3, 2, 1, 5, 6, 7, 8, 10});
+        System.out.println(p4);
+        System.out.println(maxSeriesLength(p4));
+
+        printNewExe("longest growing series length in p4:");
+        p4 = arrToList(new int[]{1, 2, 3, 3, 2, 1, 5, 6, 7, 8, 10});
+        System.out.println(p4);
+        printMaxSeriesInList(p4);
+
+        Node<Integer> p5 = arrToList(new int[]{1, 2, 3, 1, 2, 3, 1, 2, 3,});
+        Node<Integer> p6 = arrToList(new int[]{1, 2, 3});
+
+        printNewExe("Is p5 repeatations of p6?");
+        System.out.println(p5);
+        System.out.println(p6);
+        System.out.println(isFromReputations(p6, p5));
+
+        printNewExe("Is p5 contaning fully p6?");
+        p5 = arrToList(new int[]{1, 2, 3, 4, 5});
+        p6 = arrToList(new int[]{2, 3, 4});
+        System.out.println(p5);
+        System.out.println(p6);
+        System.out.println(isContaining(p6, p5));
+
+        printNewExe("Is p4 containing all one-digits numbers:");
+        System.out.println(p4);
+        System.out.println(isContainingAllOneDigits(p4));
+        Node<Integer> p7 = arrToList(new int[]{1, 0, 2, 9, 3, 8, 4, 7, 5, 6});
+        System.out.println(p7);
+        System.out.println(isContainingAllOneDigits(p7));
     }
 }
